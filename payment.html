@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAA707 - Payment Gateway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #60a5fa;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --success: #10b981;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+            --wa-green: #25D366;
+            --wa-dark: #128C7E;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 100px 20px 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+        }
+
+        /* Profile Section - Top Left */
+        .profile-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .profile-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-container:active {
+            transform: scale(0.98);
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: var(--transition);
+        }
+
+        .profile-container:hover .profile-pic {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block; 
+            border-radius: 50%;
+        }
+
+        .profile-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark);
+            letter-spacing: -0.3px;
+        }
+
+        .profile-title {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Scroll Animation */
+        .container {
+            max-width: 450px;
+            width: 100%;
+            animation: fadeInUp 0.8s ease;
+            transform: translateY(20px);
+            opacity: 0;
+            animation-fill-mode: forwards;
+            margin-top: 40px;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .logo:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .logo:active {
+            transform: scale(0.95);
+        }
+
+        .logo span {
+            font-size: 1.5rem;
+        }
+
+        .brand-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-handle {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Web Title */
+        .web-title {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(37, 99, 235, 0.3);
+            animation: fadeInDown 0.8s ease 0.2s both;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .web-title:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .web-title:active {
+            transform: scale(0.98);
+        }
+
+        .web-title i {
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Card */
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            transition: var(--transition);
+            transform: translateY(0);
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        /* Click Effects */
+        .clickable {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .clickable:active {
+            transform: scale(0.95);
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .method-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background-color: var(--light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .method-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            background-color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .method-item:active {
+            transform: scale(0.98);
+        }
+
+        .method-item.active {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+            animation: pulseBorder 2s infinite;
+        }
+
+        @keyframes pulseBorder {
+            0% { border-color: var(--primary); }
+            50% { border-color: var(--accent); }
+            100% { border-color: var(--primary); }
+        }
+
+        .method-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .method-item.active .method-checkbox {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .method-checkbox i {
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .method-item.active .method-checkbox i {
+            opacity: 1;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .method-item:hover .method-icon {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .qris-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .ewallet-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .bank-icon {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+
+        .pulsa-icon {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        }
+
+        .method-info {
+            flex: 1;
+        }
+
+        .method-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+            color: var(--dark);
+        }
+
+        .method-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .method-arrow {
+            color: var(--gray);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .method-item:hover .method-arrow {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        /* QR Section */
+        .qr-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .qr-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .qr-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .qr-container {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 20px;
+            background-color: var(--light);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .qr-container:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-container:active {
+            transform: scale(0.98);
+        }
+
+        .qr-code {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-download {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .qr-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .qr-download:active {
+            transform: scale(0.95);
+        }
+
+        .qr-download i {
+            margin-right: 8px;
+        }
+
+        .qr-note {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 15px;
+        }
+
+        /* Method Details */
+        .method-details {
+            margin-top: 20px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .method-details.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .details-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .details-title i {
+            margin-right: 10px;
+        }
+
+        /* E-wallet Options */
+        .ewallet-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .ewallet-option {
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .ewallet-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            background-color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .ewallet-option:active {
+            transform: scale(0.95);
+        }
+
+        .ewallet-icon-small {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .ewallet-option:hover .ewallet-icon-small {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .dana-bg { background-color: #00a8ff; }
+        .shopee-bg { background-color: #ee4d2d; }
+        .gopay-bg { background-color: #00aa13; }
+
+        .ewallet-option p {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+            margin-top: 5px;
+        }
+
+        /* Bank Options */
+        .bank-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bank-option {
+            display: flex;
+            align-items: center;
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .bank-option:hover {
+            transform: translateX(5px);
+            border-color: var(--accent);
+            background-color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .bank-option:active {
+            transform: scale(0.98);
+        }
+
+        .bank-icon-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transition: var(--transition);
+        }
+
+        .bank-option:hover .bank-icon-small {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .bank-info {
+            flex: 1;
+        }
+
+        .bank-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .bank-number {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Pulsa Options */
+        .pulsa-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .pulsa-option {
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .pulsa-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            background-color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .pulsa-option:active {
+            transform: scale(0.95);
+        }
+
+        .pulsa-icon-small {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            transition: var(--transition);
+        }
+
+        .pulsa-option:hover .pulsa-icon-small {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .pulsa-option p {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .pulsa-option span {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Payment Info */
+        .payment-info {
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .payment-info:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .info-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .info-text {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Description Text */
+        .description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--gray);
+            font-size: 1rem;
+            line-height: 1.7;
+            padding: 0 10px;
+            margin-top: 10px;
+        }
+
+        /* Donate Section */
+        .donate-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            display: none;
+        }
+
+        .donate-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .donate-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .donate-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .donate-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        }
+
+        .donate-button:active {
+            transform: scale(0.95);
+        }
+
+        .donate-button i {
+            margin-right: 10px;
+        }
+
+        .donate-note {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 15px;
+        }
+
+        /* Music Control */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            transition: var(--transition);
+            z-index: 100;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .music-control:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .music-control:active {
+            transform: scale(0.95);
+        }
+
+        .music-control.playing {
+            animation: pulseMusic 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseMusic {
+            0% { box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+            50% { box-shadow: 0 5px 25px rgba(37, 99, 235, 0.6); }
+            100% { box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+        }
+
+        /* WA Control (NEW FEATURE) */
+        .wa-control {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--wa-green), var(--wa-dark));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+            transition: var(--transition);
+            z-index: 100;
+            animation: float 3s ease-in-out infinite reverse; /* Reverse float */
+        }
+
+        .wa-control:hover {
+            transform: scale(1.1) rotate(-15deg);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+        }
+
+        .wa-control:active {
+            transform: scale(0.95);
+        }
+
+        /* WA Panel */
+        .wa-panel {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 250px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 99;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: var(--transition);
+            display: none;
+            pointer-events: none;
+        }
+
+        .wa-panel.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .wa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .wa-title {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .wa-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .wa-close:hover {
+            color: var(--wa-green);
+            transform: rotate(90deg);
+        }
+
+        .wa-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wa-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background-color: var(--light);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .wa-option:hover {
+            background-color: rgba(37, 211, 102, 0.1);
+            border-color: var(--wa-green);
+            transform: translateX(5px);
+        }
+
+        .wa-icon-small {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--wa-green), var(--wa-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 12px;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .wa-text span {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .wa-text small {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Music Panel */
+        .music-panel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 99;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: var(--transition);
+            display: none;
+        }
+
+        .music-panel.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .music-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .music-title {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .music-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .music-close:hover {
+            color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .music-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .music-thumb {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .music-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .music-artist {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .music-progress {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 30%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            background: var(--light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .control-btn.play-pause {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 50px;
+            height: 50px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-icon {
+            color: var(--gray);
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 70%;
+            border-radius: 3px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: var(--transition);
+            border-left: 4px solid var(--success);
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification i {
+            color: var(--success);
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .notification-content h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .notification-content p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Footer Note */
+        .footer-note {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 120px 15px 15px 15px;
+            }
+            
+            .profile-container {
+                top: 10px;
+                left: 10px;
+                padding: 8px 15px;
+            }
+
+            .web-title {
+                top: 10px;
+                right: 10px;
+                font-size: 1rem;
+                padding: 8px 15px;
+            }
+
+            .music-panel {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+
+            .wa-panel {
+                width: 250px;
+                /* Pastikan panel wa tetap rapi di mobile */
+            }
+            
+            .container {
+                margin-top: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 110px 10px 10px 10px;
+            }
+            
+            .container {
+                padding: 0;
+                margin-top: 20px;
+            }
+            
+            .card {
+                padding: 25px 20px;
+            }
+            
+            .brand-name {
+                font-size: 1.6rem;
+            }
+            
+            .ewallet-options {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .pulsa-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .qr-container {
+                width: 200px;
+                height: 200px;
+            }
+
+            .profile-container {
+                padding: 6px 12px;
+                gap: 10px;
+            }
+
+            .profile-pic {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .profile-name {
+                font-size: 0.9rem;
+            }
+
+            .profile-title {
+                font-size: 0.8rem;
+            }
+            
+            .description {
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            }
+            
+            .notification {
+                top: 80px;
+                max-width: calc(100% - 40px);
+            }
+        }
+        
+        /* Medium screens */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                padding: 110px 30px 30px 30px;
+            }
+            
+            .container {
+                margin-top: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container clickable" id="profileContainer">
+        <div class="profile-pic" id="profilePic">
+            <img src="anime1.jpg" alt="Profile Picture">
+        </div>
+        <div class="profile-text">
+            <div class="profile-name">KAA707</div>
+            <div class="profile-title">Payment Gateway Pro</div>
+        </div>
+    </div>
+
+    <div class="web-title clickable" id="webTitle">
+        <i class="fas fa-bolt"></i> @galn_au
+    </div>
+
+    <div class="wa-control clickable" id="waControl">
+        <i class="fab fa-whatsapp"></i>
+    </div>
+
+    <div class="wa-panel" id="waPanel">
+        <div class="wa-header">
+            <div class="wa-title">WhatsApp Admin</div>
+            <button class="wa-close" id="waClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="wa-options">
+            <a href="https://whatsapp.com/channel/0029VaUIK5Z2ZjCecigK4t0S" target="_blank" class="wa-option clickable">
+                <div class="wa-icon-small">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="wa-text">
+                    <span>Join Saluran</span>
+                    <small>( di buat testi bre )</small>
+                </div>
+            </a>
+            <a href="https://wa.me/62881012391309" target="_blank" class="wa-option clickable">
+                <div class="wa-icon-small">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="wa-text">
+                    <span>Kontak Admin</span>
+                    <small>GALNAUGEGE</small>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="music-control clickable" id="musicControl">
+        <i class="fas fa-music"></i>
+    </div>
+
+    <div class="music-panel" id="musicPanel">
+        <div class="music-header">
+            <div class="music-title">Musik Player</div>
+            <button class="music-close" id="musicClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="music-info">
+            <div class="music-thumb">
+                <i class="fas fa-headphones"></i>
+            </div>
+            <div class="music-name">Background Music</div>
+            <div class="music-artist">Kaaa Studio</div>
+        </div>
+        <div class="music-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-time">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+        <div class="music-controls">
+            <button class="control-btn prev" id="prevBtn">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button class="control-btn play-pause" id="playPauseBtn">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="control-btn next" id="nextBtn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+        <div class="volume-control">
+            <div class="volume-icon">
+                <i class="fas fa-volume-up"></i>
+            </div>
+            <div class="volume-slider" id="volumeSlider">
+                <div class="volume-fill" id="volumeFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <h4 id="notificationTitle">Berhasil!</h4>
+            <p id="notificationMessage">QR Code berhasil disimpan ke galeri.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="description">
+                Pilih metode pembayaran yang tersedia di bawah ini. 
+                <strong>Aman, Cepat dan Terpercaya.</strong>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="payment-methods">
+                <div class="method-item active clickable" data-method="qris">
+                    <div class="method-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="method-icon qris-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div class="method-info">
+                        <div class="method-name">QRIS</div>
+                        <div class="method-desc">Bayar dengan scan QR code</div>
+                    </div>
+                    <div class="method-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="method-item clickable" data-method="ewallet">
+                    <div class="method-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="method-icon ewallet-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="method-info">
+                        <div class="method-name">E-wallet</div>
+                        <div class="method-desc">DANA, ShopeePay, GoPay</div>
+                    </div>
+                    <div class="method-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="method-item clickable" data-method="bank">
+                    <div class="method-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="method-icon bank-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="method-info">
+                        <div class="method-name">Bank</div>
+                        <div class="method-desc">Transfer antar bank</div>
+                    </div>
+                    <div class="method-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="method-item clickable" data-method="pulsa">
+                    <div class="method-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="method-icon pulsa-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="method-info">
+                        <div class="method-name">Pulsa</div>
+                        <div class="method-desc">Isi pulsa & paket data</div>
+                    </div>
+                    <div class="method-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qr-section" id="qrSection">
+                <h3 class="qr-title">Scan QR Code untuk Pembayaran</h3>
+                <div class="qr-container clickable" id="qrContainer">
+                    <img src="https://i.supaimg.com/0f969e9b-4feb-4a74-bc1f-2aca19c41965.jpg" alt="QR Code" class="qr-code" id="qrImage">
+                </div>
+                <button class="qr-download clickable" id="downloadQR">
+                    <i class="fas fa-download"></i> Simpan ke Galeri
+                </button>
+                <p class="qr-note">Klik QR code untuk memperbesar atau tombol untuk menyimpan</p>
+            </div>
+
+            <div class="method-details" id="ewalletDetails">
+                <h3 class="details-title">
+                    <i class="fas fa-wallet"></i> Pilih E-Wallet
+                </h3>
+                
+                <div class="ewallet-options">
+                    <div class="ewallet-option clickable" data-ewallet="dana">
+                        <div class="ewallet-icon-small dana-bg">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <p>DANA</p>
+                        <span>0881010196925</span>
+                    </div>
+                    
+                    <div class="ewallet-option clickable" data-ewallet="shopee">
+                        <div class="ewallet-icon-small shopee-bg">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <p>ShopeePay</p>
+                        <span>gada</span>
+                    </div>
+                    
+                    <div class="ewallet-option clickable" data-ewallet="gopay">
+                        <div class="ewallet-icon-small gopay-bg">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <p>GoPay</p>
+                        <span>0881012681517</span>
+                    </div>
+                </div>
+                
+                <div class="payment-info">
+                    <div class="info-title">
+                        <i class="fas fa-info-circle"></i> Cara Pembayaran
+                    </div>
+                    <p class="info-text">
+                        1. Buka aplikasi e-wallet pilihan Anda<br>
+                        2. Pilih fitur transfer atau bayar<br>
+                        3. Masukkan nomor tujuan di atas<br>
+                        4. Konfirmasi dan selesaikan pembayaran
+                    </p>
+                </div>
+            </div>
+
+            <div class="method-details" id="bankDetails">
+                <h3 class="details-title">
+                    <i class="fas fa-university"></i> Pilih Bank
+                </h3>
+                
+                <div class="bank-options">
+                    <div class="bank-option clickable" data-bank="bca">
+                        <div class="bank-icon-small">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="bank-info">
+                            <div class="bank-name">Bank Central Asia (BCA)</div>
+                            <div class="bank-number">gada</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-option clickable" data-bank="mandiri">
+                        <div class="bank-icon-small">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <div class="bank-info">
+                            <div class="bank-name">Bank Mandiri</div>
+                            <div class="bank-number">gada</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-option clickable" data-bank="bni">
+                        <div class="bank-icon-small">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="bank-info">
+                            <div class="bank-name">Bank Negara Indonesia (BNI)</div>
+                            <div class="bank-number">gada</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payment-info">
+                    <div class="info-title">
+                        <i class="fas fa-info-circle"></i> Cara Transfer
+                    </div>
+                    <p class="info-text">
+                        1. Buka aplikasi mobile banking atau ATM<br>
+                        2. Pilih menu transfer antar bank<br>
+                        3. Masukkan nomor rekening tujuan di atas<br>
+                        4. Konfirmasi dan selesaikan transaksi
+                    </p>
+                </div>
+            </div>
+
+            <div class="method-details" id="pulsaDetails">
+                <h3 class="details-title">
+                    <i class="fas fa-mobile-alt"></i> Pilih Provider
+                </h3>
+                
+                <div class="pulsa-options">
+                    <div class="pulsa-option clickable" data-pulsa="telkomsel">
+                        <div class="pulsa-icon-small">
+                            <i class="fas fa-sim-card"></i>
+                        </div>
+                        <p>Telkomsel</p>
+                        <span>gada</span>
+                    </div>
+                    
+                    <div class="pulsa-option clickable" data-pulsa="xl">
+                        <div class="pulsa-icon-small">
+                            <i class="fas fa-sim-card"></i>
+                        </div>
+                        <p>XL / Axis</p>
+                        <span>gada</span>
+                    </div>
+                    
+                    <div class="pulsa-option clickable" data-pulsa="indosat">
+                        <div class="pulsa-icon-small">
+                            <i class="fas fa-sim-card"></i>
+                        </div>
+                        <p>Indosat</p>
+                        <span>gada</span>
+                    </div>
+                    
+                    <div class="pulsa-option clickable" data-pulsa="tri">
+                        <div class="pulsa-icon-small">
+                            <i class="fas fa-sim-card"></i>
+                        </div>
+                        <p>3 (Tri)</p>
+                        <span>gada</span>
+                    </div>
+                </div>
+                
+                <div class="payment-info">
+                    <div class="info-title">
+                        <i class="fas fa-info-circle"></i> Cara Isi Pulsa
+                    </div>
+                    <p class="info-text">
+                        1. Pilih provider sesuai kartu Anda<br>
+                        2. Masukkan nomor handphone tujuan<br>
+                        3. Pilih nominal pulsa atau paket data<br>
+                        4. Konfirmasi dan selesaikan pembayaran
+                    </p>
+                </div>
+            </div>
+
+            <div class="donate-section" id="donateSection">
+                <h3 class="donate-title">
+                    <i class="fas fa-heart" style="color: #f97316;"></i> Support Developer
+                </h3>
+                <a href="https://saweria.co/kaa707" class="donate-button clickable" target="_blank">
+                    <i class="fas fa-coffee"></i> Donate via Saweria
+                </a>
+                <p class="donate-note">
+                    Support pengembangan ini dengan donasi untuk server dan maintenance
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-shield-alt" style="margin-right: 8px; color: var(--success);"></i>
+            Transaksi Anda aman dan terlindungi dengan enkripsi terbaik
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // DOM Elements
+        const profileContainer = document.getElementById('profileContainer');
+        const profilePic = document.getElementById('profilePic');
+        const webTitle = document.getElementById('webTitle');
+        const musicControl = document.getElementById('musicControl');
+        const musicPanel = document.getElementById('musicPanel');
+        const musicClose = document.getElementById('musicClose');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressFill = document.getElementById('progressFill');
+        const currentTime = document.getElementById('currentTime');
+        const totalTime = document.getElementById('totalTime');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeFill = document.getElementById('volumeFill');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const qrContainer = document.getElementById('qrContainer');
+        const downloadQR = document.getElementById('downloadQR');
+        const methodItems = document.querySelectorAll('.method-item');
+        const qrSection = document.getElementById('qrSection');
+        const ewalletDetails = document.getElementById('ewalletDetails');
+        const bankDetails = document.getElementById('bankDetails');
+        const pulsaDetails = document.getElementById('pulsaDetails');
+        const donateSection = document.getElementById('donateSection');
+        const qrImage = document.getElementById('qrImage'); 
+        
+        // UPDATE: WA Elements
+        const waControl = document.getElementById('waControl');
+        const waPanel = document.getElementById('waPanel');
+        const waClose = document.getElementById('waClose');
+        
+        // Status musik & Panel
+        let isPlaying = false;
+        let isMusicPanelOpen = false;
+        let isWaPanelOpen = false; // UPDATE: Status WA
+        
+        // Auto play music on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Start music automatically
+            backgroundMusic.volume = 0.5;
+            backgroundMusic.play().then(() => {
+                isPlaying = true;
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                musicControl.classList.add('playing');
+                musicControl.innerHTML = '<i class="fas fa-pause"></i>';
+            }).catch(e => {
+                console.log("Auto-play was prevented. User interaction required.");
+            });
+        });
+
+        // Profile Click Effect
+        profileContainer.addEventListener('click', function() {
+            showNotification('Profile', 'KAA707 Payment Gateway Admin', 'info');
+            
+            // Add click animation
+            profilePic.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                profilePic.style.transform = '';
+            }, 500);
+        });
+
+        // Web Title Click Effect
+        webTitle.addEventListener('click', function() {
+            showNotification('Payment Gateway Pro', 'Versi 2.0 - Sistem Pembayaran Terintegrasi', 'info');
+            
+            // Add click animation
+            webTitle.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                webTitle.style.transform = '';
+            }, 200);
+        });
+
+        // Music Control Panel
+        musicControl.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Close WA if open
+            if(isWaPanelOpen) closeWaPanel();
+            
+            if (isMusicPanelOpen) {
+                closeMusicPanel();
+            } else {
+                openMusicPanel();
+            }
+        });
+
+        // UPDATE: WA Control Panel
+        waControl.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Close Music if open
+            if(isMusicPanelOpen) closeMusicPanel();
+
+            if (isWaPanelOpen) {
+                closeWaPanel();
+            } else {
+                openWaPanel();
+            }
+        });
+
+        function openMusicPanel() {
+            musicPanel.style.display = 'block';
+            setTimeout(() => {
+                musicPanel.classList.add('show');
+            }, 10);
+            isMusicPanelOpen = true;
+        }
+
+        function closeMusicPanel() {
+            musicPanel.classList.remove('show');
+            setTimeout(() => {
+                musicPanel.style.display = 'none';
+            }, 300);
+            isMusicPanelOpen = false;
+        }
+
+        // UPDATE: WA Panel Functions
+        function openWaPanel() {
+            waPanel.style.display = 'block';
+            setTimeout(() => {
+                waPanel.classList.add('show');
+            }, 10);
+            isWaPanelOpen = true;
+        }
+
+        function closeWaPanel() {
+            waPanel.classList.remove('show');
+            setTimeout(() => {
+                waPanel.style.display = 'none';
+            }, 300);
+            isWaPanelOpen = false;
+        }
+
+        musicClose.addEventListener('click', closeMusicPanel);
+        waClose.addEventListener('click', closeWaPanel); // UPDATE: Close listener for WA
+
+        // Music Control Functions
+        function toggleMusic() {
+            if (isPlaying) {
+                backgroundMusic.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                musicControl.classList.remove('playing');
+                musicControl.innerHTML = '<i class="fas fa-music"></i>';
+            } else {
+                backgroundMusic.play().catch(e => {
+                    showNotification('Info', 'Klik tombol play untuk memulai musik', 'info');
+                });
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                musicControl.classList.add('playing');
+                musicControl.innerHTML = '<i class="fas fa-pause"></i>';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Play/Pause button
+        playPauseBtn.addEventListener('click', toggleMusic);
+
+        // Previous button
+        prevBtn.addEventListener('click', function() {
+            backgroundMusic.currentTime = Math.max(0, backgroundMusic.currentTime - 10);
+            showNotification('Musik', '10 detik mundur', 'info');
+        });
+
+        // Next button
+        nextBtn.addEventListener('click', function() {
+            backgroundMusic.currentTime = Math.min(backgroundMusic.duration, backgroundMusic.currentTime + 10);
+            showNotification('Musik', '10 detik maju', 'info');
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            const volume = Math.max(0, Math.min(1, percent));
+            
+            backgroundMusic.volume = volume;
+            volumeFill.style.width = `${volume * 100}%`;
+        });
+
+        // Update music progress
+        backgroundMusic.addEventListener('timeupdate', function() {
+            const current = backgroundMusic.currentTime;
+            const duration = backgroundMusic.duration;
+            
+            if (duration) {
+                const percent = (current / duration) * 100;
+                progressFill.style.width = `${percent}%`;
+                
+                // Format time
+                currentTime.textContent = formatTime(current);
+                totalTime.textContent = formatTime(duration);
+            }
+        });
+
+        // Format time function
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // QR Click to Enlarge (Zoom) Logic
+        qrContainer.addEventListener('click', function() {
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '2000';
+            modal.style.padding = '20px';
+            
+            const modalImg = document.createElement('img');
+            modalImg.src = qrImage.src; 
+            modalImg.style.maxWidth = '90%';
+            modalImg.style.maxHeight = '90%';
+            modalImg.style.borderRadius = '15px';
+            modalImg.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+            
+            modal.appendChild(modalImg);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+        });
+
+        // Download QR Code
+        function downloadQRCode() {
+            if (!qrImage) return;
+            
+            // Create canvas for download
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const qrSize = 300;
+            canvas.width = qrSize;
+            canvas.height = qrSize + 80;
+            
+            // Load image to canvas
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            
+            img.onload = function() {
+                // Draw background
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw QR code
+                ctx.drawImage(img, 50, 30, qrSize-100, qrSize-100);
+                
+                // Add logo
+                ctx.fillStyle = '#2563eb';
+                ctx.font = 'bold 24px "Inter", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('KAA707', qrSize/2, qrSize + 40);
+                
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px "Inter", sans-serif';
+                ctx.fillText('@kaaae_id', qrSize/2, qrSize + 60);
+                
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '12px "Inter", sans-serif';
+                ctx.fillText('QRIS Payment', qrSize/2, qrSize + 75);
+                
+                // Create download link
+                try {
+                    const link = document.createElement('a');
+                    link.download = 'KAA707-qr-payment.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showNotification('QR Code Disimpan', 'QR Code telah disimpan ke galeri perangkat Anda', 'success');
+                } catch (e) {
+                    showNotification('Gagal Menyimpan', 'Gambar dilindungi kebijakan browser. Silakan screenshot saja.', 'error');
+                }
+            };
+            
+            img.onerror = function() {
+                showNotification('Gagal Memuat', 'Tidak dapat memproses gambar QR.', 'error');
+            };
+
+            img.src = qrImage.src;
+        }
+
+        // Event listener for download button
+        downloadQR.addEventListener('click', downloadQRCode);
+
+        // Method selection
+        methodItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const method = this.getAttribute('data-method');
+                
+                // Update active method
+                methodItems.forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Hide all sections first
+                qrSection.classList.remove('active');
+                ewalletDetails.classList.remove('active');
+                bankDetails.classList.remove('active');
+                pulsaDetails.classList.remove('active');
+                donateSection.classList.remove('active');
+                
+                // Show corresponding section based on selected method
+                if (method === 'qris') {
+                    qrSection.classList.add('active');
+                } else if (method === 'ewallet') {
+                    ewalletDetails.classList.add('active');
+                    donateSection.classList.add('active');
+                } else if (method === 'bank') {
+                    bankDetails.classList.add('active');
+                    donateSection.classList.add('active');
+                } else if (method === 'pulsa') {
+                    pulsaDetails.classList.add('active');
+                    donateSection.classList.add('active');
+                }
+                
+                // Show notification
+                let methodName = '';
+                switch(method) {
+                    case 'qris': methodName = 'QRIS'; break;
+                    case 'ewallet': methodName = 'E-wallet'; break;
+                    case 'bank': methodName = 'Transfer Bank'; break;
+                    case 'pulsa': methodName = 'Pulsa'; break;
+                }
+                
+                showNotification('Metode Dipilih', `Anda memilih ${methodName}`, 'info');
+            });
+        });
+
+        // E-wallet option selection
+        document.querySelectorAll('.ewallet-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const ewallet = this.getAttribute('data-ewallet');
+                let ewalletName = '';
+                
+                switch(ewallet) {
+                    case 'dana': ewalletName = 'DANA'; break;
+                    case 'shopee': ewalletName = 'ShopeePay'; break;
+                    case 'gopay': ewalletName = 'GoPay'; break;
+                }
+                
+                showNotification('E-wallet Dipilih', `Nomor ${ewalletName}: 0812-3456-7890`, 'success');
+            });
+        });
+
+        // Bank option selection
+        document.querySelectorAll('.bank-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const bank = this.getAttribute('data-bank');
+                let bankName = this.querySelector('.bank-name').textContent;
+                let bankNumber = this.querySelector('.bank-number').textContent;
+                
+                showNotification('Bank Dipilih', `${bankName}: ${bankNumber}`, 'success');
+            });
+        });
+
+        // Pulsa option selection
+        document.querySelectorAll('.pulsa-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const provider = this.getAttribute('data-pulsa');
+                let providerName = this.querySelector('p').textContent;
+                let providerNumber = this.querySelector('span').textContent;
+                
+                showNotification('Provider Dipilih', `${providerName}: ${providerNumber}`, 'success');
+            });
+        });
+
+        // Show notification
+        function showNotification(title, message, type = 'success') {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Set color based on type
+            if (type === 'info') {
+                notification.style.borderLeftColor = '#2563eb';
+                notification.querySelector('i').className = 'fas fa-info-circle';
+            } else if (type === 'warning') {
+                notification.style.borderLeftColor = '#f59e0b';
+                notification.querySelector('i').className = 'fas fa-exclamation-triangle';
+            } else if (type === 'error') {
+                notification.style.borderLeftColor = '#ef4444';
+                notification.querySelector('i').className = 'fas fa-times-circle';
+            } else {
+                notification.style.borderLeftColor = '#10b981';
+                notification.querySelector('i').className = 'fas fa-check-circle';
+            }
+            
+            notification.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize everything on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            
+            // Set initial volume
+            backgroundMusic.volume = 0.5;
+            volumeFill.style.width = '50%';
+            
+            // Animate elements on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe card elements for animation
+            document.querySelectorAll('.card, .method-item, .details-title, .payment-info').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Selamat Datang', 'Pilih metode pembayaran di bawah', 'info');
+            }, 1000);
+        });
+
+        // Close panels when clicking outside
+        document.addEventListener('click', function(e) {
+            // Music Panel Logic
+            if (isMusicPanelOpen && !musicPanel.contains(e.target) && !musicControl.contains(e.target)) {
+                closeMusicPanel();
+            }
+            // WA Panel Logic (UPDATE)
+            if (isWaPanelOpen && !waPanel.contains(e.target) && !waControl.contains(e.target)) {
+                closeWaPanel();
+            }
+        });
+    </script>
+</body>
+</html>
